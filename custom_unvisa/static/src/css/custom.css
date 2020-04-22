@@ -1,0 +1,27 @@
+ .notes_width {
+display:block; 
+width:150px; 
+max-height:60px; 
+overflow:scroll; 
+overflow-x:hidden;
+}
+
+.custom_class [data-id="name"]
+{
+	width: 150px;
+}
+.custom_class [data-field="name"]
+{
+	width: 150px;
+	white-space: pre-wrap;
+    overflow: scroll;
+    max-height: 60px;
+    display: block;
+}
+
+
+[data-field="des_unit_measurement"] 
+ {    width: 300px;} 
+[data-id="des_unit_measurement"]  
+{    width: 300px;}
+

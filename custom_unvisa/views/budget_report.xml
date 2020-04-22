@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="custom_budget_template">
+			<t t-foreach="docs" t-as="o">
+				<t t-call="custom_unvisa.custom_layout">
+					<div class="page">
+						<div class="oe_structure" />
+						<br/>
+						<div class="row">
+							<br />
+						</div>
+						<div class="row">
+							<div class="col-xs-12">
+								<div class="text-left">
+									<div t-if="o.name" style="font-size:20px">
+										<br/>
+										<p>
+											<b>Presupuesto no:</b>
+											<span t-field="o.name"/>
+											
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-xs-12" style="border-top:2pt solid black;">
+								<div class="col-xs-6 text-left">
+									<p>
+										<strong>Responsable:</strong>
+										
+										<span t-field="user.name" />
+									</p>
+								</div>
+								<div class="col-xs-6">
+									<p>
+										<strong>fetch:</strong>
+										
+										<span t-esc="create_date" />
+									</p>
+								</div>
+								
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col-xs-12 ">
+								<table class="table table-condensed">
+									<tr t-foreach="o.crossovered_budget_line" t-as="d">
+										<tr style="border-top:2pt solid black;">
+											<td colspan="12">
+											</td>
+										</tr>
+										<td colspan="6">
+											<table class="table table-condensed" style="float:left;">
+												
+												<tr>
+													<td>
+														<b>Posición presupuestaria</b>
+													</td>
+													<td>
+														<b>Cantidad planificada</b>
+													</td>
+												</tr>
+												<tr>
+													<td>
+														<span t-field="d.general_budget_id.name" />
+													</td>
+													<td>
+														<span t-field="d.planned_amount" />
+													</td>
+												</tr>
+												
+											</table>
+										</td>
+										<td colspan="6">
+											<table class="table table-condensed" style="float:right;">
+												
+												<tr>
+													<td>
+														<b>Ud</b>
+													</td>
+													<td>
+														<b>Producto</b>
+													</td>
+													<td class="text-right">
+														<b>Ud</b>
+													</td>
+													<td class="text-right" >
+														<b>Alto (cm)</b>
+													</td>
+													<td class="text-right" >
+														<b>Ancho (cm)</b>
+													</td>
+												</tr>
+												<tr t-foreach="d.check_measurement_line" t-as="l">
+													<td>
+														<span t-field="l.ud"/>
+													</td>
+													
+													<td>
+														<span t-field="l.des_unit_measurement" />
+														
+													</td>
+													<td class="text-right">
+														<span t-field="l.ud" />
+													</td>
+													<td class="text-right">
+														<span t-field="l.long" />
+													</td>
+													<td class="text-right">
+														<span t-field="l.height" />
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+									<tr style="border-top:2pt solid black;">
+										<td colspan="12">
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+						
+					</div>
+					
+				</t>
+			</t>
+		</template>
+	</data>
+</odoo>

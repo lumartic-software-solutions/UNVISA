@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+	<record model="ir.ui.view" id="sale_oder_form_view_inherit">
+		<field name="name">sale.order.form.view</field>
+		<field name="model">sale.order</field>
+		<field name="inherit_id" ref="sale.view_order_form"/>
+		<field name="arch" type="xml">
+			<!--  copy measurement Field In  Sale Order Line -->
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group"
+				position="inside">
+				<label for="copy_measurement" />
+				<div>
+					<field name="copy_measurement" />
+				</div>
+			</xpath>
+			<xpath expr="//field[@name='partner_id']" position="after">
+<!--				<field name="copy_measurement"  attrs="{'readonly':[('state', 'in' , ('sale','done'))]}"/-->
+				<field name="is_partner" invisible="1"/>
+			</xpath>
+			
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='product_id']"
+				position="replace">
+				<field name="product_id" context="{'partner_id':parent.partner_id,
+					'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom,
+					'company_id': parent.company_id,'search_default_groupby_categ':1 }" attrs="{'readonly':
+					['|','|', ('qty_invoiced', '&gt;', 0), ('procurement_ids', '!=', []),('state'
+					, 'in' , ('sale','done'))]}" required="0"/>
+			</xpath>
+			
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='product_uom_qty']"
+				position="replace">
+				<field context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty, 'pricelist':parent.pricelist_id,
+					'uom':product_uom, 'uom_qty_change':True, 'company_id': parent.company_id}" name="product_uom_qty"
+					class="oe_inline" required="0"/>
+				
+			</xpath>
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='product_uom']"
+				position="replace">
+				<field name="product_uom" groups="product.group_uom" class="oe_inline oe_no_button"
+					attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}" required="0"/>
+			</xpath>
+			
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='price_unit']"
+				position="replace">
+				<field name="price_unit" required="0"/>
+			</xpath>
+			
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='customer_lead']"
+				position="replace">
+				<field name="customer_lead" class="oe_inline" required="0"/>
+				days
+			</xpath>
+			
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='tax_id']"
+				position="after">
+				<field name="work_hours" />
+			</xpath>
+			<xpath expr="//field[@name='price_unit']" position="after">
+				<field name="total_ud"/>
+			</xpath>
+			<xpath expr="//notebook//page//field[@name='order_line']//form//field[@name='name']"
+				position="after" >
+				<field name="check_product_uom"   invisible="1"/>
+				<field name="result"   invisible="1"/>
+				<field name="check_measurement" invisible="1"/>
+				<label for="check_measurement_line" domain="[('check_product_uom', '=', True)]" attrs="{'invisible':
+					['|',('check_product_uom','=',False) ,('state' , 'in' , ('sale','done'))], 'readonly':
+					[('state' , 'in' , ('sale','done'))]}"/>
+				<field name="check_measurement_line" widget="one2many_list" domain="[('check_product_uom',
+					'=', True)]" attrs="{'invisible': [('check_product_uom','=',False)],'readonly':
+					[('state' , 'in' , ('sale','done'))]}" context="{'check_uom' : check_measurement}"/>
+				<label for="related_product"/>
+				<field name="related_product">
+				</field>
+			</xpath>
+			
+			<!--  Invisible  Section In  Sale Order Line -->
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='layout_category_id']"
+				position="replace">
+				<field name="layout_category_id" domain="[('active_categ','=',True)]"  />
+			</xpath>
+			
+			<!--  Invisible  Delivered Quantity Label In  Sale Order Line -->
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//label[@for='qty_delivered']"
+				position="replace">
+				<label for="qty_delivered" string=" " invisible="1"/>
+			</xpath>
+			<!--  Invisible  Invoiced Quantity Label In  Sale Order Line -->
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//label[@for='qty_invoiced']"
+				position="replace">
+				<label for="qty_invoiced" string=" " invisible="1"/>
+			</xpath>
+			<!--  Invisible  Delivered Quantity Field In  Sale Order Line -->
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='qty_delivered']"
+				position="replace">
+				<field name="qty_delivered" attrs="{'readonly': [('qty_delivered_updateable', '=',
+					False)]}" invisible="1" />
+			</xpath>
+			<!--  Invisible  Invoiced Quantity Field In  Sale Order Line -->
+			<xpath expr="//notebook//page//field[@name='order_line']//form//group//group//field[@name='qty_invoiced']"
+				position="replace">
+				<field name="qty_invoiced"  invisible="1"  />
+			</xpath>
+			<xpath expr="//tree" position="replace">
+				<tree string="Sales Order Lines" decoration-info="invoice_status=='to invoice'" class="custom_class">
+					<field name="sequence" widget="handle"/>
+					<field name="sequence" invisible="1"/>
+					<field name="product_id" attrs="{'readonly': ['|', ('qty_invoiced', '&gt;', 0), ('procurement_ids',
+						'!=', [])]}" context="{'partner_id':parent.partner_id, 'quantity':product_uom_qty,
+						'check_measurement_line':check_measurement_line, 'pricelist':parent.pricelist_id,
+						'uom':product_uom, 'company_id': parent.company_id}"/>
+					<!--  Invisible  Section In  Sale Order Line -->
+					<field name="layout_category_id" groups="sale.group_sale_layout" domain="[('active_categ','=',True)]"/>
+					<!-- Add Style in Description -->
+					<field name="name" class="notes_width"/>
+					<field name="product_uom_qty" string="Ordered Qty" context="{'partner_id':parent.partner_id,
+						'quantity':product_uom_qty, 'pricelist':parent.pricelist_id, 'uom':product_uom,
+						'company_id': parent.company_id}"/>
+					
+					<field name="check_product_uom"  invisible="1" />
+					<field name="check_measurement"  invisible="1" />
+					<field name="check_measurement_line" />
+					<!--  Invisible  Delivered Quantity In  Sale Order Line -->
+					<field name="qty_delivered" invisible="1" attrs="{'readonly': [('qty_delivered_updateable',
+						'=', False)]}"/>
+					<!--  Invisible  Invoiced Quantity In  Sale Order Line -->
+					<field name="qty_invoiced" invisible="1" />
+					
+					<field name="qty_to_invoice" invisible="1"/>
+					
+					<field name="product_uom" attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"
+						context="{'company_id': parent.company_id}" groups="product.group_uom" options="{&quot;no_open&quot;:
+						True}"/>
+					<field name="analytic_tag_ids" groups="analytic.group_analytic_accounting" widget="many2many_tags"/>
+					<field name="price_unit" attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+					<field name="tax_id" widget="many2many_tags" domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
+						attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"/>
+					<field name="discount" groups="sale.group_discount_per_so_line"/>
+					<field name="price_subtotal" widget="monetary" groups="sale.group_show_price_subtotal"/>
+					<field name="price_total" widget="monetary" groups="sale.group_show_price_total"/>
+					<field name="qty_delivered_updateable" invisible="1"/>
+					<field name="procurement_ids" invisible="1"/>
+					<field name="state" invisible="1"/>
+					<field name="invoice_status" invisible="1"/>
+					<field name="customer_lead" invisible="1"/>
+					<field name="currency_id" invisible="1"/>
+				</tree>
+			</xpath>
+			<xpath expr="//field[@name='order_line']" position="attributes">
+<!--				<attribute name="context">{'copy_measurement':copy_measurement,'order_id':active_id ,'order_line':order_line}</attribute-->
+				<attribute name="context">{'order_id':active_id ,'order_line':order_line}</attribute>
+				<attribute name="attrs">{'readonly': [('is_partner', '=', False)]}</attribute>
+			</xpath>
+		</field>
+	</record>
+	
+	
+	<!-- sale layout category form-->
+	<record model="ir.ui.view" id="sale_layout_category_inherit">
+		<field name="name">sale.layout_category.form.view</field>
+		<field name="model">sale.layout_category</field>
+		<field name="inherit_id" ref="sale.report_configuration_form_view"/>
+		<field name="arch" type="xml">
+			<field name="sequence" position="after" >
+				<field name="active_categ" />
+			</field>
+		</field>
+	</record>
+	
+	<!-- sale layout category tree-->
+	<record model="ir.ui.view" id="sale_layout_category_tree_inherit">
+		<field name="name">sale.layout_category.form.view</field>
+		<field name="model">sale.layout_category</field>
+		<field name="inherit_id" ref="sale.report_configuration_tree_view"/>
+		<field name="arch" type="xml">
+			<field name="sequence" position="before" >
+				<field name="active_categ" />
+			</field>
+		</field>
+	</record>
+	
+	<record model="ir.ui.view" id="sale_quatation_inherit">
+		<field name="name">sale.order.form.view</field>
+		<field name="model">sale.order</field>
+		<field name="inherit_id" ref="sale.view_quotation_tree"/>
+		<field name="arch" type="xml">
+			<xpath expr="//tree//field[@name='name']" position="after">
+				<field name="client_order_ref" />
+			</xpath>
+		</field>
+	</record>
+	
+	<record id="product.product_search_form_view" model="ir.ui.view">
+		<field name="name">product.product.search</field>
+		<field name="model">product.product</field>
+		<field name="mode">primary</field>
+		<field name="inherit_id" ref="product.product_template_search_view"/>
+		<field name="arch" type="xml">
+			<field name="attribute_line_ids" position="replace">
+				<field name="attribute_value_ids" groups="product.group_product_variant"/>
+				<field name="product_tmpl_id" string="Product Template"/>
+				<filter name="groupby_categ" string="Category" context="{'group_by': 'categ_id'}"/>
+			</field>
+		</field>
+	</record>
+	
+	<!-- Add Check Measurement Line In Account Invoice Line Tree View -->
+	<record model="ir.ui.view" id="account_invoice_tree_view_inherit">
+		<field name="name">account.invoice.form.inherit</field>
+		<field name="model">account.invoice</field>
+		<field name="inherit_id" ref="account.invoice_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='partner_id']" position="after">
+<!--				<field name="copy_measurement"  attrs="{'readonly':[('state', 'in' , ('open','paid','cancel'))]}"/-->
+				<field name="is_partner" invisible="1"/>
+			</xpath>
+			<xpath expr="//notebook//page//field[@name='invoice_line_ids']//tree" position="replace">
+				<tree string="Invoice Lines"  class="custom_class" default_order="id,sale_order_no" >
+					<field name="sequence" widget="handle"/>
+					<field name="product_id"/>
+					<field name="sale_order_no"/>
+					<field name="layout_category_id" groups="sale.group_sale_layout"/>
+					<field name="check_measurement" invisible="1"/>
+					<field name="check_product_uom"  invisible="1" />
+					<field name="check_measurement_line" domain="[('check_product_uom', '=', True)]" attrs="{'invisible':
+						[('check_product_uom','=',False)]}" context="{'check_uom' : check_measurement}"/>
+					<field name="origin" invisible="1"/>
+					<field name="name"  class="notes_width"/>
+					<field name="company_id" invisible="1"/>
+					<field name="account_id" groups="account.group_account_user" domain="[('company_id',
+						'=', parent.company_id), ('internal_type', '=', 'other')]"/>
+					<field name="quantity"/>
+					<field name="uom_id" groups="product.group_uom"/>
+					<field name="price_unit"/>
+					<field name="discount" groups="base.group_no_one"/>
+					<field name="invoice_line_tax_ids" widget="many2many_tags" context="{'type':parent.type}"
+						domain="[('type_tax_use','=','sale'),('company_id', '=', parent.company_id)]"
+						options="{'no_create': True}"/>
+					<field name="price_subtotal"/>
+					<field name="currency_id" invisible="1"/>
+				</tree>
+			</xpath>
+			<xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+<!--				<attribute name="context">{'copy_measurement':copy_measurement,'invoice_id':active_id ,'invoice_line_ids':invoice_line_ids}</attribute-->
+				<attribute name="context">{'invoice_id':active_id ,'invoice_line_ids':invoice_line_ids}</attribute>
+				<attribute name="attrs">{'readonly': [('is_partner', '=', False)]}</attribute>
+			</xpath>
+		</field>
+	</record>
+	
+	<!-- Add Check Measurement Line In Account Invoice Line Form View -->
+	<record id="view_invoice_line_form_inherit" model="ir.ui.view">
+		<field name="name">account.invoice.line.form</field>
+		<field name="model">account.invoice.line</field>
+		<field name="inherit_id" ref="account.view_invoice_line_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//form//group" position="after">
+				<field name="check_product_uom"  invisible="1" />
+				<field name="check_measurement" invisible="1"/>
+				<label for="check_measurement_line" domain="[('check_product_uom', '=', True)]" attrs="{'invisible':
+					[('check_product_uom','=',False)]}"/>
+				
+				<field name="check_measurement_line" widget="one2many_list" domain="[('check_product_uom',
+					'=', True)]" attrs="{'invisible': [('check_product_uom','=',False)]}" context="{'check_uom'
+					: check_measurement}"/>
+			</xpath>
+			<xpath expr="//field[@name='price_unit']" position="after">
+				<field name="total_ud"/>
+				<field name="copy_measurement" />
+				<field name="results" invisible="1"/>
+			</xpath>
+			<xpath expr="//field[@name='quantity']" position="replace">
+				<field name="quantity" class="oe_inline" required="0"/>
+			</xpath>
+			<xpath expr="//field[@name='price_unit']" position="replace">
+				<field name="price_unit" required="0"/>
+			</xpath>
+			<xpath expr="//field[@name='account_id']" position="replace">
+				<field name="account_id" required="0"/>
+			</xpath>
+			<xpath expr="//field[@name='product_id']" position="after">
+				<field name="sale_order_no" />
+			</xpath>
+		</field>
+	</record>
+	
+	
+	<!-- Add Work Hours In Product Template Form view -->
+	<record id="product_template_only_form_view_inherit" model="ir.ui.view">
+		<field name="name">product.template.inherit</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_only_form_view"/>
+		<field name="groups_id" eval="[(4, ref('sales_team.group_sale_salesman'))]"/>
+		<field name="arch" type="xml">
+			<xpath expr="//form//field[@name='categ_id']" position="after">
+				<field name="work_hours" attrs="{'invisible': [('type', 'not in', ('service'))]}"
+					/>
+			</xpath>
+			
+		</field>
+	</record>
+	
+	
+	<!-- Add Check Measurement Line Tree View -->
+	<record id="check_measurement_line_tree" model="ir.ui.view">
+		<field name="name">check measurement line tree</field>
+		<field name="model">check.measurement.line</field>
+		<field name="arch" type="xml">
+			<tree editable="bottom">
+				<field name="ud"/>
+				<field name="custom" invisible="1"/>
+				<field name="des_unit_measurement" />
+				<field name="long"/>
+				<field name="height" attrs="{'invisible': [('custom', '=', 'ml')]}"/>
+				<field name="new_long" attrs="{'invisible': ['|',('custom', '=', 'ml'),('custom',
+					'=', 'ML')]}"/>
+				<field name="new_height" attrs="{'invisible': ['|',('custom', '=', 'ml'),('custom',
+					'=', 'ML')]}"/>
+				<field name="measurement_result" />
+			</tree>
+		</field>
+	</record>
+	
+	<!-- Action Check Measurement Line -->
+	<record id="action_check_measurement_line_action" model="ir.actions.act_window">
+		<field name="name">check measurement line Action</field>
+		<field name="res_model">check.measurement.line</field>
+		<field name="view_type">tree</field>
+		<field name="view_mode">tree</field>
+	</record>
+	
+	
+	<record model="ir.ui.view" id="crossovered_budget_lines_form_view_inherit">
+		<field name="name">crossovered.budget.lines.form.view.inherit</field>
+		<field name="model">crossovered.budget</field>
+		<field name="inherit_id" ref="account_budget.crossovered_budget_view_form"/>
+		<field name="arch" type="xml">
+			
+			<xpath expr="//notebook//page//field[@name='crossovered_budget_line']//form" position="replace">
+				<form string="Budget Lines">
+					<group>
+						<group>
+							<field name="general_budget_id"/>
+							<field name="planned_amount" widget="monetary"/>
+							<field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+						</group>
+						<group>
+							<label for="date_from" string="Period"/>
+							<div>
+								<field name="date_from" class="oe_inline"/>
+								-
+								<field name="date_to" class="oe_inline"/>
+							</div>
+							<field name="paid_date" groups="base.group_no_one"/>
+							<field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+						</group>
+						<field name="check_product_uom"  invisible="1" />
+						<field name="check_measurement_line"/>
+					</group>
+					
+				</form>
+			</xpath>
+			<xpath expr="//notebook//page//field[@name='crossovered_budget_line']//tree" position="replace">
+				<tree string="Budget Lines">
+					<field name="general_budget_id"/>
+					<field name="analytic_account_id" groups="analytic.group_analytic_accounting"/>
+					<field name="date_from"/>
+					<field name="date_to"/>
+					<field name="paid_date" groups="base.group_no_one"/>
+					<field name="planned_amount" sum="Planned Amount" widget="monetary"/>
+					<field name="practical_amount" sum="Practical Amount" widget="monetary"/>
+					<field name="theoritical_amount" sum="Theoretical Amount" widget="monetary"/>
+					<field name="percentage"/>
+					<field name="check_measurement_line"/>
+				</tree>
+			</xpath>
+		</field>
+	</record>
+	
+	<!-- add measurement line in delivery tree view -->
+	<record model="ir.ui.view" id="stock_picking_form_view_inherit">
+		<field name="name">stock.picking.form.view.inherit</field>
+		<field name="model">stock.picking</field>
+		<field name="inherit_id" ref="stock.view_picking_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//field[@name='move_lines']" position="inside">
+				<tree decoration-muted="state == 'cancel'" string="Moves" create="false">
+					<field name="product_id"/>
+					<field name="check_measurement_line"/>
+					<field name="product_uom_qty"/>
+					<field name="product_uom" options="{'no_open': True, 'no_create': True}" string="Unit
+						of Measure" groups="product.group_uom"/>
+					<field name="state"/>
+				</tree>
+			</xpath>
+			<xpath expr="//field[@name='pack_operation_product_ids']//tree//field[@name='product_id']" position="after">
+				<field name="check_measurement_line"/>
+			</xpath>
+		</field>
+	</record>
+	
+	<!-- add measurement line in delivery form view -->
+	<record id="view_move_form_inherit" model="ir.ui.view">
+		<field name="name">stock.move.form.inherit</field>
+		<field name="model">stock.move</field>
+		<field name="inherit_id" ref="stock.view_move_picking_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//group" position="after">
+				<group string="Measurement Lines">
+					<field name="check_measurement_line"/>
+				</group>
+			</xpath>
+		</field>
+	</record>
+	
+	<!-- add measurement line in operation form view -->
+	<record id="view_pack_operation_details_form_inherit" model="ir.ui.view">
+        <field name="name">stock.pack.operation.details.form.inherit</field>
+        <field name="model">stock.pack.operation</field>
+        <field name="inherit_id" ref="stock.view_pack_operation_details_form"/>
+        <field name="arch" type="xml">
+        	<xpath expr="//group[@name='qty_to']" position="after">
+				<group string="Measurement Lines">
+					<field name="check_measurement_line"/>
+				</group>
+			</xpath>
+        </field>
+    </record>
+</odoo>
+
+                     

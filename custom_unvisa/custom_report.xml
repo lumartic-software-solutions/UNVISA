@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		
+		<!-- customer or warehose report -->
+		<report id="report_sale_custom" string="Sale Report" model="sale.order" report_type="qweb-pdf"
+			file="custom_unvisa.custom_sale_template" name="custom_unvisa.custom_sale_template"
+			menu="True" />
+		<report id="report_invoice_custom" string="Invoice Report" model="account.invoice"
+			report_type="qweb-pdf" file="custom_unvisa.custom_invoice_template" name="custom_unvisa.custom_invoice_template"
+			menu="True" />
+		<report id="report_budget_custom" string="Budget Report" model="crossovered.budget"
+		report_type="qweb-pdf" file="custom_unvisa.custom_budget_template" name="custom_unvisa.custom_budget_template"
+		menu="True" />
+	</data>
+</odoo>

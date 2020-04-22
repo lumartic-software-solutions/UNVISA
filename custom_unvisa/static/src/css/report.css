@@ -1,0 +1,6 @@
+table#table1  tr:first-child  > td{
+   border-top-color: white !important;
+}
+table#table2  tr:first-child  > td{
+   border-top-color: white !important;
+}
