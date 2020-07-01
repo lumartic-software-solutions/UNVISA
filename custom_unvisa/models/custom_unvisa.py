@@ -424,6 +424,7 @@ class AccountInvoice(models.Model):
         
 class AccountInvoiceLines(models.Model):
     _inherit = 'account.invoice.line'
+    _order = 'sale_order_no'
     
     @api.depends('check_measurement_line.measurement_result')
     @api.multi
